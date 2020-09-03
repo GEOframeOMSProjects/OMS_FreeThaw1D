@@ -1,0 +1,267 @@
+/*
+ * 1D heat equation with phase change solver
+ *   
+ *   Authors: Niccolo` Tubini, Stephan Gruber, Riccardo Rigon
+ *   License  Creative Commons 4.0
+ *   
+ * 	 References:  
+ * 	 	Dall’Amico, M., Endrizzi, S., Gruber, S., and Rigon, R. (2011). A robust and energy-conserving model of freezing variably-saturated soil. 
+ * 	 	Cryosphere, 5(2), 469–484. https://doi.org/10.5194/tc-5-469-2011
+ * 	 	
+ * 	 	Casulli, V., and Zanolli, P. 
+ * 	 	"A nested Newton-type algorithm for finite volume methods solving Richards' equation in mixed form." 
+ * 	 	SIAM Journal on Scientific Computing 32.4 (2010): 2255-2273.
+ */
+import static oms3.SimBuilder.instance as OMS3
+import static oms3.SimBuilder.*
+
+/* the variable home contains the path of the project folder and it is
+ *  used to define the local path for input adn output files.
+ */
+def home = oms_prj
+
+
+// start and end date of the simulation
+
+def startDate = "2000-01-01 00:00"
+def endDate = "2000-04-10 00:00"
+ 
+// time interval of temporal series [minutes]
+def tTimestep = 60
+
+def writingFrequency = 1000
+
+// Input/output files' paths
+def pathGrid = "$home/data/Grid_NetCDF/NeumannAnalytical_Melting_dz_01.nc"
+def pathTopBC = "$home/data/Timeseries/Neumann_278K.csv"
+def pathBottomBC = "$home/data/Timeseries/Neumann_268K.csv"
+def pathSaveDates = "$home/data/Timeseries/Neumann_save_all.csv"
+def pathOutput = "$home/output/OMS_NeumannAnalytical_Melting_dz01_3600s.nc"
+
+/* Available SFCC models:
+ * - "DallAmico"
+ * - "Lunardini"
+ * - "McKenzie"
+ * - "none"
+*/
+def sfccModel = "none"
+
+/* Type of the top boundary condition:
+ * - "Top Neumann" the energy flux through the soil surface is assigned [W/m2]
+ * 					(positive: inflow, negative: outflow)
+ * - "Top Dirichlet" the air temperature is provided [K]            
+*/
+def topBCType = "Top Dirichlet"
+
+/* Type of the bottom boundary condition:
+ * - "Bottom Dirichlet" the water pressure value is assigned
+ * - "Bottom Neumann" you prescribe the water flux through the 
+ *						domain bottom 						
+*/
+def bottomBCType = "Bottom Dirichlet"
+
+/* Available thermal conductivity models for soil:
+ * - "Johansen"
+ * - "Lunardini"
+ * - "water"
+*/
+def soilThermalConductivityModel = "water"
+
+/* Available state equation models:
+ * - "Lunardini"
+ * - "Soil"
+ * - "Water"
+*/
+def stateEquationModel = "water"
+			
+/* Available thermal conductivity models for excess ice
+ *  - "Arithmetic mean"
+ *  - "Geometric mean"
+ *  - "Harmonic mean"
+ *  - "max"
+ *  - "min"
+*/
+def interfacThermalConductivityModel = "Harmonic mean"
+
+
+solver = OMS3.sim(name: "Neumann analytical solution - ice melting", {
+
+resource "$oms_prj/lib"
+
+	model(while : "reader_data_topBC.doProcess"  ){
+
+		components {
+			
+			// reads of the grid.nc file
+			"reader_NetCDF" "monodimensionalProblemTimeDependent.ReadNetCDFFreezingThawing1D"
+			
+			// solver
+			"solver" "frozensoilsolver1D.CallFreezingThawingSolver"
+			
+			// readers for the boundary condition time-series and water volume and temperature
+			"reader_data_topBC"					"org.jgrasstools.gears.io.timedependent.OmsTimeSeriesIteratorReader"
+			"reader_data_bottomBC" 				"org.jgrasstools.gears.io.timedependent.OmsTimeSeriesIteratorReader"
+			"reader_data_inSaveDates"			"org.jgrasstools.gears.io.timedependent.OmsTimeSeriesIteratorReader"
+			
+			// this component stores the output during the simulation
+			"buffer" "bufferWriter.FreezingThawingBuffer1D"
+			
+			// write the output in a NetCDF
+			"writer_NetCDF" "monodimensionalProblemTimeDependent.WriteNetCDFFreezingThawing1DDouble"
+		
+		}
+		
+		parameter {
+
+			// File path of grid.nc file, the file created with 1_excess_ice_grid.ipynb	
+			"reader_NetCDF.gridFilename" "${pathGrid}"
+						
+			// water density [kg/m3]
+			"solver.waterDensity" "1000.0"
+			// ice density [kg/m3]
+			"solver.iceDensity" "970.0"
+			// specific thermal capacity of water [J/kg K]
+			"solver.specificThermalCapacityWater" "4187.0"
+			// specific thermal capacity of ice [J/kg K]
+			"solver.specificThermalCapacityIce" "2108.0"
+			// thermal conductivity of water [W/m K]
+			"solver.thermalConductivityWater" "0.6"
+			// thermal conductivity of water [W/m K]
+			"solver.thermalConductivityIce" "2.09"
+			// latent heat of fusion of water [J/ kg]
+			"solver.latentHeatFusion" "333700"
+
+			// reference temperature used to define the internal energy [K]
+			"solver.temperatureRef" "273.15"
+			
+			"solver.sfccModel"           "${sfccModel}"
+			"solver.stateEquationModel"  "${stateEquationModel}"
+			"solver.soilThermalConductivityModel"  "${soilThermalConductivityModel}"
+			"solver.interfaceConductivityModel"    "${interfacThermalConductivityModel}"
+
+			"solver.topBCType"  "${topBCType}";
+			"solver.bottomBCType"  "${bottomBCType}"
+			
+
+			// nested Newton tolerance
+			"solver.newtonTolerance" "0.003337"
+
+			/* Algorithm to solve the nonlinear system:
+			* - 0 --> Newton's method
+			* - 1 --> nested Newton (suggested)
+			* 
+			 */
+			"solver.nestedNewton" "1"
+
+			/* time step [s], it must be consistent
+			* with tTimestep defined at line 22
+			 */
+			"solver.tTimestep" tTimestep*60
+
+			/* time step [s] used to integrate the equation,
+			* this is the Delta t used in the numerical scheme
+			* timeDelta <= tTimestep
+			* 
+			 */
+			"solver.timeDelta" "3600"
+			
+			/*
+			 * Number of Picard iteration during each time step to update 
+			 * the values of thermal conductivity with the new solution
+			 */
+			"solver.picardIteration" "1"
+			
+
+			// parameters of the reader for input top boundary condition values
+			"reader_data_topBC.file"             "${pathTopBC}"
+			"reader_data_topBC.idfield"          "ID"  
+			"reader_data_topBC.tStart"           "${startDate}"
+			"reader_data_topBC.tEnd"             "${endDate}"
+			"reader_data_topBC.tTimestep"        "${tTimestep}"
+			"reader_data_topBC.fileNovalue"      "-9999"
+
+			// parametersof the reader for bottom boundary condition values
+			"reader_data_bottomBC.file"             "${pathBottomBC}"
+			"reader_data_bottomBC.idfield"          "ID"  
+			"reader_data_bottomBC.tStart"           "${startDate}"
+			"reader_data_bottomBC.tEnd"             "${endDate}"
+			"reader_data_bottomBC.tTimestep"        "${tTimestep}"
+			"reader_data_bottomBC.fileNovalue"      "-9999"
+			
+			// parameters of the reader for date saving
+			"reader_data_inSaveDates.file"             "${pathSaveDates}"
+			"reader_data_inSaveDates.idfield"          "ID"  
+			"reader_data_inSaveDates.tStart"           "${startDate}"
+			"reader_data_inSaveDates.tEnd"             "${endDate}"
+			"reader_data_inSaveDates.tTimestep"        "${tTimestep}"
+			"reader_data_inSaveDates.fileNovalue"      "-9999"
+
+			// folder path for the output files
+			"writer_NetCDF.fileName" "${pathOutput}"
+			"writer_NetCDF.writeFrequency" "${writingFrequency}"
+			// here you can enter some strings to describe your simulation
+			"writer_NetCDF.briefDescritpion" " "
+			"writer_NetCDF.topBC" "${topBCType}"
+			"writer_NetCDF.bottomBC" "${bottomBCType}"
+			"writer_NetCDF.pathTopBC" "${pathTopBC}"
+			"writer_NetCDF.pathBottomBC" "${pathBottomBC}"
+			"writer_NetCDF.pathGrid" "${pathGrid}"
+			"writer_NetCDF.timeDelta" "3600s"
+			"writer_NetCDF.sfccModel" "${sfccModel}"
+			"writer_NetCDF.stateEquationModel" "${stateEquationModel}"
+			"writer_NetCDF.soilThermalConductivityModel" "${soilThermalConductivityModel}"
+			"writer_NetCDF.interfaceThermalConductivityModel" "${interfacThermalConductivityModel}"
+			"writer_NetCDF.timeUnits" "Minutes since 01/01/1970 00:00:00 UTC"
+			
+			
+//			"buffer.doProcessBuffer" "true"
+			"buffer.writeFrequency" "${writingFrequency}"
+		}
+
+		connect{
+
+			// From   -> To
+
+			"reader_NetCDF.z"             		            	"solver.z"
+			"reader_NetCDF.spaceDelta"    		           	 	"solver.spaceDeltaZ"
+			"reader_NetCDF.controlVolumeDimension"				"solver.volumesSoil"
+			"reader_NetCDF.KMAX"				            	"solver.KKMAX"      		
+			"reader_NetCDF.temperatureIC" 		            	"solver.temperatureIC"
+			"reader_NetCDF.rheologyID"    		            	"solver.inRheologyID"
+			"reader_NetCDF.parameterID"        	            	"solver.inParameterID"
+			"reader_NetCDF.soilParticlesDensity"        		"solver.soilParticlesDensity"
+			"reader_NetCDF.soilParticlesThermalConductivity"    "solver.thermalConductivitySoilParticles"
+			"reader_NetCDF.soilParticlesSpecificHeatCapacity"   "solver.specificThermalCapacitySoilParticles"
+			"reader_NetCDF.thetaS"        						"solver.thetaS"
+			"reader_NetCDF.thetaR"        						"solver.thetaR"
+			"reader_NetCDF.meltingTemperature"        			"solver.meltingTemperature"
+			"reader_NetCDF.par1"        						"solver.par1"
+			"reader_NetCDF.par2"        						"solver.par2"
+			"reader_NetCDF.par3"        						"solver.par3"
+			"reader_NetCDF.par4"        						"solver.par4"
+			
+			"reader_NetCDF.z" 									"writer_NetCDF.mySpatialCoordinate"
+			"reader_NetCDF.controlVolumeDimension"				"writer_NetCDF.myControlVolume"
+			"reader_data_topBC.doProcess" 						"writer_NetCDF.doProcess"	
+			
+			"reader_data_topBC.outData" 						"solver.inTopBC"
+			
+			"reader_data_bottomBC.outData" 						"solver.inBottomBC"
+			
+			"reader_data_inSaveDates.outData" 					"solver.inSaveDate"
+			
+			"reader_data_topBC.tCurrent" 						"solver.inCurrentDate"
+			
+			"solver.outputToBuffer" 							"buffer.inputVariable"
+			"solver.doProcessBuffer" 							"buffer.doProcessBuffer"
+			"solver.inCurrentDate" 								"buffer.inputDate"
+			
+			"buffer.myVariable" 								"writer_NetCDF.myVariables"
+		
+
+		}
+	}
+
+	}
+
+)

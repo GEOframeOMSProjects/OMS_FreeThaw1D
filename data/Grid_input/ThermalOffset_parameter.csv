@@ -1,0 +1,3 @@
+spDensity,spConductivity,spSpecificHeatCapacity,thetaS,thetaR,meltingT,par1,par2,par3,par4
+# 
+2700,3.0,1000,0.46,0.1,273.15,1.5,1.2,nan,nan
