@@ -11,7 +11,7 @@ At present, a common problem of physical-based frozen soil model concerns the tr
 `FreThaw1D` model solves the so called enthalpy - or conservative - formulation. The novelty regards the use of the nested Newton-Casulli-Zanolli (NCZ) algorithm, ([Casulli and Zanolli](https://doi.org/10.1137/100786320)) to linearize the nonlinear system resulting from the approximation of the governing equation. Using the enthalpy formulation and the NCZ algorithm the convergence of the solver is guarateed for any time step size. This is a key feature since the integration time step can be choosen accordingly to the time scale of the processes to study, from seconds to days.
 
 
-![Alt text](docs/frozensoil.jpg?raw=true "Title")
+![Alt text](Jupyter_Notebook/image/frozensoil.jpg?raw=true "Title")
 
 # Website
 - [GEOframe](http://geoframe.blogspot.com/)
