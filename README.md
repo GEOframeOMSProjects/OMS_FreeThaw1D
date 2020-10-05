@@ -1,4 +1,4 @@
-# OMS_FreThaw1D
+# OMS_FreeThaw1D
 
 Freezing and thawing of soils affect a wide range of biogeochemical and hydrological ([Walvoord and Kurylyk, 2016](https://doi.org/10.2136/vzj2016.01.0010); [Schuur
 et al., 2015](https://doi.org/10.1038/nature14338)) processes and interact with engineered structures in cold regions. This foundational importance together with the vast extent of cold regions globally makes the simulation of freezing and thawing soil an important and well-researched topic ([Streletskiy et al., 2019](https://doi.org/10.1088/1748-9326/aaf5e6); [Walvoord and Kurylyk, 2016](https://doi.org/10.2136/vzj2016.01.0010); [Harris et al., 2009](https://doi.org/10.1016/j.earscirev.2008.12.002)). The interest in understanding and anticipating the consequences of permafrost thaw driven by anthropogenic climate change has added additional urgency.
@@ -8,7 +8,7 @@ On the other hand, permafrost evolution is characterized by a long timescale and
 Therefore, it is desirable to have a numerical model that can efficiently simulate frozen soil at both short timescale and long timescale.
 At present, a common problem of physical-based frozen soil model concerns the treatment of the nonlinear behavior of the energy and enthalpy as function of temperature, water content and other governing variables. Because of this nonlinearity, the model may fail to compute the correct solution, or a short time step must be chosen leading to an increase of the computational cost.
 
-`FreThaw1D` model solves the so called enthalpy - or conservative - formulation. The novelty regards the use of the nested Newton-Casulli-Zanolli (NCZ) algorithm, ([Casulli and Zanolli](https://doi.org/10.1137/100786320)) to linearize the nonlinear system resulting from the approximation of the governing equation. Using the enthalpy formulation and the NCZ algorithm the convergence of the solver is guarateed for any time step size. This is a key feature since the integration time step can be choosen accordingly to the time scale of the processes to study, from seconds to days.
+`FreeThaw1D` model solves the so called enthalpy - or conservative - formulation. The novelty regards the use of the nested Newton-Casulli-Zanolli (NCZ) algorithm, ([Casulli and Zanolli](https://doi.org/10.1137/100786320)) to linearize the nonlinear system resulting from the approximation of the governing equation. Using the enthalpy formulation and the NCZ algorithm the convergence of the solver is guarateed for any time step size. This is a key feature since the integration time step can be choosen accordingly to the time scale of the processes to study, from seconds to days.
 
 
 ![Alt text](Jupyter_Notebook/image/frozensoil.jpg?raw=true "Title")
@@ -18,7 +18,7 @@ At present, a common problem of physical-based frozen soil model concerns the tr
 - [NSERC PermafrostNet](https://www.permafrostnet.ca/)
 
 # OMS
-`FreThaw1D` is written in Java,  works under the [`OMS3`](https://abouthydrology.blogspot.com/2017/08/oms-3-essentials.html)(David et al., 2013) framework and is part of the `GEOframe` system ([Formetta et al., 2014](https://doi.org/10.1016/j.envsoft.2014.01.019), [Bancheri, 2017](http://eprints-phd.biblio.unitn.it/2679/)). It was produced as part of the Ph.D. work by Niccolò Tubini.
+`FreeThaw1D` is written in Java,  works under the [`OMS3`](https://abouthydrology.blogspot.com/2017/08/oms-3-essentials.html)(David et al., 2013) framework and is part of the `GEOframe` system ([Formetta et al., 2014](https://doi.org/10.1016/j.envsoft.2014.01.019), [Bancheri, 2017](http://eprints-phd.biblio.unitn.it/2679/)). It was produced as part of the Ph.D. work by Niccolò Tubini.
 Here you can find the [source code](https://github.com/geoframecomponents/FreThaw1D)
 
 # Acknowledgements
