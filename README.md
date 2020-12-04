@@ -23,7 +23,7 @@ Here you can find the [source code](https://github.com/geoframecomponents/FreTha
 
 GEOframe programs run on Java 8. The OMS project can be run either within the [OMS v3 Console](https://alm.engr.colostate.edu/cb/wiki/16961) or by using [Docker](https://hub.docker.com/r/omslab/oms/).
 
-# OMS v3 Console
+## OMS v3 Console
 - As first step it is necessary to install the JDK 8. There are two options:
   - Download open JDK 8 LTS from https://adoptopenjdk.net/
     - Install it
@@ -47,6 +47,14 @@ GEOframe programs run on Java 8. The OMS project can be run either within the [O
 
 - In the console setting, select the panel Run and set the Java path to the previously installed JDK. The Java path can be  
 ![Alt text](Jupyter_Notebook/image/java_path.png?raw=true "Title")
+
+## OMS from Docker
+Please refers to the guidelines at https://hub.docker.com/r/omslab/oms/. Please use the version `0.3_py3`.
+
+# Project documentation
+In the folder Jupyter_Notebook` you can find
+- `\_README.ipynb` containing a description of the folder structure
+- `00_FreeThaw1D.ipynb` containing a detailed descritption of this OMS project.
 
 # Acknowledgements
 
