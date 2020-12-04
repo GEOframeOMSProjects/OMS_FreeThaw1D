@@ -53,7 +53,7 @@ Please refers to the guidelines at https://hub.docker.com/r/omslab/oms/. Please 
 
 # Project documentation
 In the folder Jupyter_Notebook` you can find
-- `\_README.ipynb` containing a description of the folder structure
+- `_README.ipynb` containing a description of the folder structure
 - `00_FreeThaw1D.ipynb` containing a detailed descritption of this OMS project.
 
 # Acknowledgements
