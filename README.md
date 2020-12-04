@@ -26,28 +26,27 @@ GEOframe programs run on Java 8. The OMS project can be run either within the [O
 # OMS v3 Console
 - As first step it is necessary to install the JDK 8. There are two options:
   - Download open JDK 8 LTS from https://adoptopenjdk.net/
-  - Install it
-  - find the JAVA_HOME
-    - on Windows open a terminal and run `where javac`
-    - on Mac open a terminal and run `where java`
+    - Install it
+    - find the JAVA_HOME
+      - on Windows open a terminal and run `where javac`
+      - on Mac open a terminal and run `where java`
   or
   - install Anaconda
-  - create the environment geoframe_vicenza. This install a JDK 8 on your laptop. To create an enviroment open the Anaconda prompt
+    - create the environment geoframe_vicenza. This install a JDK 8 on your laptop. To create an enviroment open the Anaconda prompt
     - open Anaconda prompt
-    - set in the folder containing the file *geoframe_vicenza.yaml*
-    -  `conda env create -f geoframe_vicenza.yaml`
-    -  `conda activate geoframe_vicenza`
-  - find the JAVA_HOME
-    - from the Anaconda prompt `echo JAVA_HOME`
+      - set in the folder containing the file *geoframe_vicenza.yaml*
+      -  `conda env create -f geoframe_vicenza.yaml`
+      -  `conda activate geoframe_vicenza`
+    - find the JAVA_HOME
+      - from the Anaconda prompt `echo JAVA_HOME`
     
 - Download the OMS v3 Console version 3.6.28 from  https://alm.engr.colostate.edu/cb/wiki/16961
 - Unzip the OMS Console and 
   - on Windows run the `console.bat` file
   - on Mac or Linux open a terminal and execute `./console.sh &`
 
-- In the console setting, select the panel Run and set the Java path to the previously installed JDK. The Java path can be
-
-  
+- In the console setting, select the panel Run and set the Java path to the previously installed JDK. The Java path can be  
+![Alt text](Jupyter_Notebook/image/java_path.png?raw=true "Title")
 
 # Acknowledgements
 
