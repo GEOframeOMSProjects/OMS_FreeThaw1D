@@ -1,4 +1,4 @@
-spDensity,spConductivity,spSpecificThermalCapacity,thetaS,thetaR,meltingT,par1,par2,par3,par4
+spDensity,spConductivity,spSpecificHeatCapacity,thetaS,thetaR,meltingT,par1,par2,par3,par4
 # case Tm=-4 [C]
 nan,nan,nan,nan,nan,269.15,nan,nan,nan,nan
 # case Tm=-1 [C]
