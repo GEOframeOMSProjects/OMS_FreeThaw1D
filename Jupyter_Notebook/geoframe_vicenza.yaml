@@ -28,7 +28,7 @@ dependencies:
   - pip:
     - bkcharts==0.2
     - hydroeval==0.0.3
-    - gf-group==0.0.7
+    - gf-group==0.0.8
     - netcdf4==1.5.3
 prefix: /Applications/anaconda3/envs/geoframe_vicenza
 
